@@ -8,9 +8,9 @@ const Message = require("./Message");
 const MyRedis = require("./MyRedis");
 const ConnectMessage = require("./ConnectMessage");
 const appInsights = require("applicationinsights");
-const { hostName, port, pwd, appInsightKey } = require("./config");
+const config = require("./config");
 
-appInsights.setup(appInsightKey).start();
+appInsights.setup(config.appInsightKey).start();
 var client = appInsights.defaultClient;
 let channelToSocketMap = new Map();
 var socketToChannelMap = new Map();
@@ -29,16 +29,16 @@ function subscribeToChannel(channelId) {
   myRedis.subscribe(channelId, (err, count) => {
     if (err) {
       var propertySet = {
-        errorMessage: "couldn't subscribe to channel",
-        descriptiveMessage: err.message,
-        channelId: channelId,
+        "errorMessage": "couldn't subscribe to channel",
+        "descriptiveMessage": err.message,
+        "channelId": channelId
       };
       client.trackEvent({ name: "redisSubConnError", properties: propertySet });
     } else {
       var propertySet = {
-        errorMessage: "null",
-        descriptiveMessage: "subscribed to channel",
-        channelId: channelId,
+        "errorMessage": "null",
+        "descriptiveMessage": "subscribed to channel",
+        "channelId": channelId
       };
       client.trackEvent({ name: "redisSubConn", properties: propertySet });
     }
@@ -47,11 +47,15 @@ function subscribeToChannel(channelId) {
 
 myRedis.on("message", (channel, message) => {
   // pass the message to all sockets associated with a channel/room
+  var m = JSON.parse(message);
+  console.log(
+    "sending message to room: " + channel + " content:  " + m.content
+  );
   sendMessageToSockets(channel, message);
 });
 
 function sendMessageToSockets(channelId, message) {
-  io.to(channelId).emit(message); // emits message to the room named as channelId
+  io.to(channelId).emit("ops", message); // emits message to the room named as channelId
 }
 
 io.on("connection", (socket) => {
