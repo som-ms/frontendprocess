@@ -38,7 +38,7 @@ function MyRedis() {
   });
 
   redis.on("close", function () {
-    client.trackMetric({ name: "redisSubConnClosed", value: 1.0 });
+    client.trackMetric({ name: "redisSubConnOpen", value: -1.0 });
   });
   redis.on("error", (err) => {
     var propertySet = {

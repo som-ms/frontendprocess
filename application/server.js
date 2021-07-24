@@ -14,13 +14,11 @@ appInsights.setup(appInsightKey).start();
 var client = appInsights.defaultClient;
 let channelToSocketMap = new Map();
 var socketToChannelMap = new Map();
-var hasRedisConnEstablished = false;
 let myRedis = new MyRedis();
 
 myRedis.on("ready", function () {
   client.trackMetric({ name: "redisSubConnOpen", value: 1.0 });
   console.log("Redis connection Established");
-  hasRedisConnEstablished = true;
 });
 // handle map on Onconnection & disconnection  - done
 // handle Redis Subscriber connection
@@ -53,7 +51,7 @@ myRedis.on("message", (channel, message) => {
 });
 
 function sendMessageToSockets(channelId, message) {
-  io.to(channelId).emit(message);
+  io.to(channelId).emit(message); // emits message to the room named as channelId
 }
 
 io.on("connection", (socket) => {
