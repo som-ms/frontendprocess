@@ -107,12 +107,3 @@ function updateChannelToSocketMap(socketId, channelId, isDeleteRequired) {
     }
   }
 }
-
-/*
-//   io.to(socketId).emit("ops", JSON.stringify(messageObj));
-
-io.on("disconnect", (reason) => {
-  console.log("disconnect with reasone: " + reason);
-});
-
-*/
